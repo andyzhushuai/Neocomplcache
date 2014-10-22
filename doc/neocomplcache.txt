@@ -1,6 +1,6 @@
 *neocomplcache.txt*	Ultimate auto completion system for Vim
 
-Version: 7.0
+Version: 5.0
 Author : Shougo <Shougo.Matsu@gmail.com>
 License: MIT license  {{{
     Permission is hereby granted, free of charge, to any person obtaining
@@ -22,372 +22,301 @@ License: MIT license  {{{
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 }}}
 
-CONTENTS					*neocomplcache-contents*
+CONTENTS						*neocomplcache-contents*
 
 Introduction		|neocomplcache-introduction|
-Install			|neocomplcache-install|
 Interface		|neocomplcache-interface|
   Commands		  |neocomplcache-commands|
   Variables		  |neocomplcache-variables|
   Key mappings		  |neocomplcache-key-mappings|
 Examples		|neocomplcache-examples|
-Sources			|neocomplcache-sources|
-  User sources		  |neocomplcache-user-sources|
-Create source		|neocomplcache-create-source|
+Plugins			|neocomplcache-plugins|
+Create plugin		|neocomplcache-create-plugin|
+ToDo			|neocomplcache-todo|
+Bugs			|neocomplcache-bugs|
 Changelog		|neocomplcache-changelog|
 
 ==============================================================================
-INTRODUCTION					*neocomplcache-introduction*
+INTRODUCTION						*neocomplcache-introduction*
 
-*neocomplcache* performs keyword completion by maintaining a cache of keywords in
-the current buffer. Because I implemented it by paying own expenses unlike the
-keyword completion including the Vim composing type, neocomplcache can be
-customized flexibly. Unfortunately neocomplcache may use more memory than
-other plugins.
+*neocomplcache* performs keyword completion by making a cache of keyword in
+buffer. Because I implemented it by paying own expenses unlike the keyword
+completion including the Vim composing type, neocomplcache can be customized
+flexibly. Unfortunately neocomplcache may use more memory than other
+plugins.
 
-						*neocomplcache-version5*
-Because all variable names are changed in neocomplcache Ver.5, there is no
-backward compatibility. In the case of an upgrade, you should use the next
+							*neocomplcache-version5*
+Because all variable names are changed in neocomplcache Ver.5, there is not
+backward compatibility. In the case of the upgrade, you should use the next
 script which Mr.thinca made.
 http://gist.github.com/422503
 
 ==============================================================================
-INSTALL						*neocomplcache-install*
-
-1: Extract the file and put files in your Vim directory
-   (usually ~/.vim/ or Program Files/Vim/vimfiles on Windows).
-2: Execute |:NeoComplCacheEnable| command or set
-let g:neocomplcache_enable_at_startup = 1
-in your .vimrc.
-
-						*neocomplcache-asyncronous*
-With neocomplcache Ver.6.0, if |vimproc| is installed, neocomplcache creates
-the cache asynchronously.
-
-vimproc is distributed at: http://github.com/Shougo/vimshell/tree/master
-
-To use vimproc, you must compile it. Refer to the vimproc documentation.
-
-Note: Snippets feature(snippets_complete source) was splitted from Ver.7.
-      If you used it, please install snippets_complete source manually.
-
-https://github.com/Shougo/neocomplcache-snippets-complete
-
-==============================================================================
-INTERFACE					*neocomplcache-interface*
+INTERFACE						*neocomplcache-interface*
 
 ------------------------------------------------------------------------------
-COMMANDS 					*neocomplcache-commands*
+COMMANDS 						*neocomplcache-commands*
 
-:NeoComplCacheEnable				*:NeoComplCacheEnable*
+:NeoComplCacheEnable					*:NeoComplCacheEnable*
 		Validate neocomplcache and initialize it.
 		Warning: Conventional cache disappears.
 
-:NeoComplCacheDisable				*:NeoComplCacheDisable*
+:NeoComplCacheDisable					*:NeoComplCacheDisable*
 		Invalidate neocomplcache and clean it up.
 
-:NeoComplCacheToggle				*:NeoComplCacheToggle*
+:NeoComplCacheToggle					*:NeoComplCacheToggle*
 		Change a lock state of neocomplcache.
 		While locking neocomplcache, automatic completion is not
 		possible.
-		Note: This command enables neocomplcache when neocomplcache is
-		disabled.
 
-:Neco [{anim-number}] 				*:Neco*
+:Neco 							*:Neco*
 		Secret.
 
-:NeoComplCacheLock				*:NeoComplCacheLock*
+:NeoComplCacheLock					*:NeoComplCacheLock*
 		Lock neocomplcache.
 		While locking neocomplcache, manual completion is possible.
 		The lock status is buffer local.
-		Note: This command is disabled when neocomplcache is disabled.
 
-:NeoComplCacheUnlock				*:NeoComplCacheUnlock*
+:NeoComplCacheUnLock					*:NeoComplCacheUnLock*
 		Unlock neocomplcache.
-		Note: This command is disabled when neocomplcache is disabled.
 
-:NeoComplCacheLockSource {source-name}		*:NeoComplCacheLockSource*
-		Disable {source-name} source completion. Disable state is
-		buffer local.
-
-:NeoComplCacheUnlockSource {source-name}	*:NeoComplCacheUnlockSource*
-		Unlock {source-name} source completion.
-
-:NeoComplCacheAutoCompletionLength		*:NeoComplCacheAutoCompletionLength*
+:NeoComplCacheAutoCompletionLength			*:NeoComplCacheAutoCompletionLength*
 		Change start length of automatic completion.
-		This length is buffer local.
 
-:NeoComplCacheCachingBuffer [bufname]		*:NeoComplCacheCachingBuffer*
+:NeoComplCacheCachingBuffer [bufname]			*:NeoComplCacheCachingBuffer*
 		Caching [bufname] buffer.  Warning: considerably take time,
 		for the big buffer.  Select current buffer when [bufname]
 		omitted.  When [bufname] buffer is not cacheed, perform only
 		simple cacheing.
 
-:NeoComplCacheCachingSyntax [filetype]		*:NeoComplCacheCachingSyntax*
+:NeoComplCacheCachingSyntax [filetype]			*:NeoComplCacheCachingSyntax*
 		Caching [filetype] syntax file.
 		Select current buffer filetype when [filetype] omitted.
 
-:NeoComplCacheCachingDictionary [filetype]	*:NeoComplCacheCachingDictionary*
-		Caching [filetype] dictionary file.
-		Select current buffer filetype when [filetype] omitted.
-
-:NeoComplCacheCachingTags [bufname]		*:NeoComplCacheCachingTags*
-		Caching [bufname] tags file.
-		Select current buffer filetype when [bufname] omitted.
-
-:NeoComplCacheCachingInclude [bufname]		*:NeoComplCacheCachingInclude*
-		Caching [bufname] include file.
-		Select current buffer name when [bufname] omitted.
-
-:NeoComplCacheCachingDisable [bufname]		*:NeoComplCacheCachingDisable*
+:NeoComplCacheCachingDisable [bufname]			*:NeoComplCacheCachingDisable*
 		Disable [bufname] buffer's cache.
 		The cache will be deleted.
 		Select current buffer when [bufname] omitted.
 
-:NeoComplCacheCachingEnable [bufname]		*:NeoComplCacheCachingEnable*
+:NeoComplCacheCachingEnable [bufname]			*:NeoComplCacheCachingEnable*
 		Enable [bufname] buffer's cache.
 		Select current buffer when [bufname] omitted.
 
-:NeoComplCachePrintSource [bufname]		*:NeoComplCachePrintSource*
+:NeoComplCachePrintSource [bufname]			*:NeoComplCachePrintSource*
 		Output [bufname] buffer's cache in current buffer.
 		This command is for debug.
 		Select current buffer when [bufname] omitted.
 		For a command for debugging, a user will not need to use it mainly.
 
-:NeoComplCacheOutputKeyword [bufname]		*:NeoComplCacheOutputKeyword*
+:NeoComplCacheOutputKeyword [bufname]			*:NeoComplCacheOutputKeyword*
 		Write the keyword which cacheed [bufname] buffer in current
 		buffer.  Select current buffer when [bufname] omitted.  When
 		you make a dictionary file by yourself, it may be
 		convenient.
 
-:NeoComplCacheCreateTags [bufname]		*:NeoComplCacheCreateTags*
+:NeoComplCacheCreateTags [bufname]			*:NeoComplCacheCreateTags*
 		Create tags from [bufname] buffer.
 		Select current buffer when [bufname] omitted.
 
-------------------------------------------------------------------------------
-VARIABLES 					*neocomplcache-variables*
+:NeoComplCacheEditSnippets [filetype]			*:NeoComplCacheEditSnippets*
+		Edit [filetype] snippets.  Edit current buffer's filetype
+		snippets when [filetype] omitted.  When there is not
+		[filetype] snippet file, it is generated newly.  This
+		command edits a snippet file in g:neocomplcache_snippets_dir
+		with precedence.  It is done re-cache automatically when you
+		store a snippet file.
 
-g:neocomplcache_enable_at_startup		*g:neocomplcache_enable_at_startup*
+:NeoComplCacheEditRuntimeSnippets [filetype]		*:NeoComplCacheEditRuntimeSnippets*
+		Edit [filetype] snippets. Edit current buffer's filetype
+		snippets when [filetype] omitted. When there is not
+		[filetype] snippet file, it is generated newly. This
+		command edits a runtime snippet file with snippets_complete.
+		It is done re-cache automatically when you store a snippet
+		file.
+
+:NeoComplCachePrintSnippets [filetype]			*:NeoComplCachePrintSnippets*
+		Print [filetype] snippets.  Print current buffer's filetype
+		snippets when [filetype] omitted.
+
+------------------------------------------------------------------------------
+VARIABLES 						*neocomplcache-variables*
+
+g:neocomplcache_enable_at_startup			*g:neocomplcache_enable_at_startup*
 		This variable controls whether I validate neocomplcache at
 		the time of Vim start.  This option should set it in .vimrc.
-		
+	
 		Because default value is 0, you cannot use neocomplcache
 		unless you validate it by manual operation.
 
-g:neocomplcache_max_list			*g:neocomplcache_max_list*
+g:neocomplcache_max_list				*g:neocomplcache_max_list*
 		This variable controls the number of candidates displayed in
 		a pop-up menu.  The case beyond this value is cut down a
 		candidate.
-		
+	
 		Default value is 100.
 
-g:neocomplcache_max_keyword_width		*g:neocomplcache_max_keyword_width*
+g:neocomplcache_max_keyword_width			*g:neocomplcache_max_keyword_width*
 		This variable controls the indication width of a candidate
 		displayed in a pop-up menu.  The case beyond this value is
 		cut down properly.
-		
+	
 		Default value is 50.
 
-g:neocomplcache_max_menu_width			*g:neocomplcache_max_menu_width*
-		This variable controls the indication width of a menu displayed
-		in a pop-up menu.  The case beyond this value is cut down.
-		
+g:neocomplcache_max_filename_width			*g:neocomplcache_max_filename_width*
+		This variable controls the indication width of a file name
+		displayed in a pop-up menu.  The case beyond this value is
+		cut down.
+	
 		Default value is 15.
 
-g:neocomplcache_auto_completion_start_length	*g:neocomplcache_auto_completion_start_length*
-		This variable controls the number of the input completion
+g:neocomplcache_auto_completion_start_length		*g:neocomplcache_auto_completion_start_length*
+		This variable controls the number of the input completioning
 		at the time of key input automatically.
-		
+	
 		Default value is 2.
 
-g:neocomplcache_manual_completion_start_length	*g:neocomplcache_manual_completion_start_length*
-		This variable controls the number of the input completion
+g:neocomplcache_manual_completion_start_length		*g:neocomplcache_manual_completion_start_length*
+		This variable controls the number of the input completioning
 		at the time of manual completion.  It is convenient when you
 		reduce this value, but may get heavy when you deleted a
 		letter in <C-h> or <BS> at popup indication time.
-		
-		Default value is 0.
+	
+		Default value is 2.
 
-g:neocomplcache_min_keyword_length		*g:neocomplcache_min_keyword_length*
+g:neocomplcache_min_keyword_length			*g:neocomplcache_min_keyword_length*
 		In a buffer or dictionary files, this variable controls
 		length of keyword becoming the object of the completion at
 		the minimum.
-		
+	
 		Default value is 4.
 
-g:neocomplcache_min_syntax_length		*g:neocomplcache_min_syntax_length*
+g:neocomplcache_min_syntax_length			*g:neocomplcache_min_syntax_length*
 		In syntax files, this variable controls length of keyword
 		becoming the object of the completion at the minimum.
-		
+	
 		Default value is 4.
 
-g:neocomplcache_enable_ignore_case		*g:neocomplcache_enable_ignore_case*
+g:neocomplcache_enable_ignore_case			*g:neocomplcache_enable_ignore_case*
 		When neocomplcache looks for candidate completion, this
 		variable controls whether neocomplcache ignores the upper-
 		and lowercase.  If it is 1, neocomplcache ignores case.
-		
+	
 		Default value is 'ignorecase'.
 
-g:neocomplcache_enable_smart_case		*g:neocomplcache_enable_smart_case*
+g:neocomplcache_enable_smart_case			*g:neocomplcache_enable_smart_case*
 		When a capital letter is included in input, neocomplcache do
 		not ignore the upper- and lowercase.
-		
-		Default value is 'infercase'.
+	
+		Default value is 0.
 
-g:neocomplcache_disable_auto_complete		*g:neocomplcache_disable_auto_complete*
+g:neocomplcache_disable_auto_complete			*g:neocomplcache_disable_auto_complete*
 		This variable controls whether you invalidate automatic
 		completion.  If it is 1, automatic completion becomes
 		invalid, but can use the manual completion by <C-x><C-u>.
-		
+	
 		Default value is 0.
 
-g:neocomplcache_enable_wildcard			*g:neocomplcache_enable_wildcard*
+g:neocomplcache_enable_wildcard				*g:neocomplcache_enable_wildcard*
 		This variable controls whether neocomplcache accept wild
 		card character '*' for input-saving.
-		
+	
 		Default value is 1.
 
-g:neocomplcache_enable_cursor_hold_i		*g:neocomplcache_enable_cursor_hold_i*
+g:neocomplcache_enable_quick_match			*g:neocomplcache_enable_quick_match*
+		For input-saving, this variable controls whether you can
+		choose a candidate with a alphabet or number displayed
+		beside a candidate after '-'.  When you input 'ho-a',
+		neocomplcache will select candidate 'a'.
+	
+		Default value is 0.
+
+g:neocomplcache_enable_cursor_hold_i			*g:neocomplcache_enable_cursor_hold_i*
 		This variable controls whether neocomplcache use |CursorHoldI| event
 		when complete candidates.
-		Note: You should not use this option if less than Vim 7.3.418.
-		Note: This option must be set before call |:NeoComplCacheEnable|.
-		
+	
 		Default value is 0.
 
-g:neocomplcache_cursor_hold_i_time		*g:neocomplcache_cursor_hold_i_time*
-		If g:neocomplcache_enable_cursor_hold_i is non zero and in
-		insert mode, this value changes 'updatetime' option.
-
-		Default value is 300.
-
-g:neocomplcache_enable_insert_char_pre		*g:neocomplcache_enable_insert_char_pre*
-		This variable controls whether neocomplcache use
-		|InsertCharPre| event when complete candidates.
-		Note: You should not use this option if less than Vim 7.3.461.
-		Note: This option must be set before call |:NeoComplCacheEnable|.
-		Note: This option is experimental.
-		
-		Default value is 0.
-
-g:neocomplcache_enable_auto_select		*g:neocomplcache_enable_auto_select*
+g:neocomplcache_enable_auto_select			*g:neocomplcache_enable_auto_select*
 		When neocomplcache displays candidates, this option controls
 		whether neocomplcache selects the first candidate
 		automatically.  If you enable this option, neocomplcache's
-		completion behavior is like |AutoComplPop|.
-		
+		completion behaivior is like |AutoComplPop|.
+
 		Default value is 0.
 
-g:neocomplcache_enable_auto_delimiter		*g:neocomplcache_enable_auto_delimiter*
-		This option controls whether neocomplcache insert delimiter
-		automatically.  For example, /(filename) or #(Vim script).
+g:neocomplcache_cursor_hold_i_time			*g:neocomplcache_cursor_hold_i_time*
+		This variable defines time of automatic completion by a milli second unit.
 		
-		Default value is 0.
+		Default value is 300.
 
-g:neocomplcache_enable_camel_case_completion	*g:neocomplcache_enable_camel_case_completion*
+g:neocomplcache_enable_camel_case_completion		*g:neocomplcache_enable_camel_case_completion*
 		When you input a capital letter, this variable controls
 		whether neocomplcache takes an ambiguous searching as an end
 		of the words in it.  For example, neocomplcache come to
 		match it with ArgumentsException when you input it with AE.
-		
+	
 		Default value is 0.
 
-g:neocomplcache_enable_underbar_completion	*g:neocomplcache_enable_underbar_completion*
+g:neocomplcache_enable_underbar_completion		*g:neocomplcache_enable_underbar_completion*
 		When you input _, this variable controls whether
 		neocomplcache takes an ambiguous searching as an end of the
 		words in it.  For example, neocomplcache come to match it
-		with "public_html" when you input it with "p_h".
-		
+		with 'public_html' when you input it with 'p_h'.
+	
 		Default value is 0.
 
-g:neocomplcache_enable_fuzzy_completion		*g:neocomplcache_enable_fuzzy_completion*
-		When you input one character, this variable controls whether
-		neocomplcache takes an ambiguous searching as an end of the
-		words in it.  For example, neocomplcache come to match it
-		with "public_html" or "PublicHtml" when you input it with "puh".
-		Note: If |g:neocomplcache_fuzzy_completion_start_length| is 3,
-		"ph" does not complete "public_html".
-		Note: This match is too heavy. So, it is enabled when your
-		input length is longer than or equal to
-		|g:neocomplcache_fuzzy_completion_start_length| and less than
-		20 characters.
-		
-		Default value is 0.
-
-g:neocomplcache_fuzzy_completion_start_length	*g:neocomplcache_fuzzy_completion_start_length*
-		This variable controls length of fuzzy completion start length.
-		For example, If this variable is "3", third and after input characters are
-		fuzzy matched.  But first and second input characters are not
-		fuzzy matched.
-		Note: If this variable changed, completion speed may be too slow.
-
-		Default value is 3.
-
-g:neocomplcache_enable_caching_message		*g:neocomplcache_enable_caching_message*
-		When make cache, this variable controls whether neocomplcache
-		displays the message in Command-line.
-		
+g:neocomplcache_enable_display_parameter		*g:neocomplcache_enable_display_parameter*
+		When you input, this variable controls whether neocomplcache
+		displays the prototype of the function in Command-line.
+		Only vim_complete supports now.
+	
 		Default value is 1.
 
-g:neocomplcache_caching_limit_file_size		*g:neocomplcache_caching_limit_file_size*
+g:neocomplcache_caching_limit_file_size			*g:neocomplcache_caching_limit_file_size*
 		This variable set file size to make a cache of a file.  If
 		open file is bigger than this size, neocomplcache do not
 		make a cache.
-		
+	
 		Default value is 500000.
 
-g:neocomplcache_disable_caching_file_path_pattern
-						*g:neocomplcache_disable_caching_file_path_pattern*
-		This variable set a pattern of the buffer file path. If matched it,
-		neocomplcache does not save a cache of the buffer. When it is
-		an empty character string, neocomplcache will ignore.
-		
+g:neocomplcache_disable_caching_buffer_name_pattern	*g:neocomplcache_disable_caching_buffer_name_pattern*
+		This variable set a pattern of the buffer name. If matched it,
+		neocomplcache does not make a cache of the buffer. When it is
+		an empty character string, it becomes invalid.
+	
 		Default value is ''.
 
-g:neocomplcache_lock_buffer_name_pattern	*g:neocomplcache_lock_buffer_name_pattern*
+g:neocomplcache_lock_buffer_name_pattern		*g:neocomplcache_lock_buffer_name_pattern*
 		This variable set a pattern of the buffer name. If matched it,
 		neocomplcache does not complete automatically. When it is an
-		empty character string, neocomplcache will ignore.
-		
+		empty character string, it becomes invalid.
+	
 		Default value is ''.
 
-g:neocomplcache_compare_function		*g:neocomplcache_compare_function*
-		This variable set compare candidates function.
-		The compare function specification is same to |sort()|
-		compare function. If you change compare function, you must
-		create compare function.
-		
-		Default value is 'neocomplcache#compare_rank'.
+g:neocomplcache_snippets_dir				*g:neocomplcache_snippets_dir*
+		This variable appoints the pass of the snippet files which
+		user defined.  It cuts the directory by plural appointment
+		in comma separated value.  When there is not the directory
+		which appointed here, neocomplcache will ignore.  User
+		defined snippet files are read after having read a normal
+		snippet files.  It is overwritten redundant snippet.
+	
+		There is not this variable unless a user defines it by oneself.
 
-g:neocomplcache_enable_prefetch			*g:neocomplcache_enable_prefetch*
-		This variable controls whether neocomplcache prefetch.
-		This variable is non 0, neocomplcache don't flick in auto completion.
-		Note: This variable has side effect.
-		Partial function (ex: |complete_check()|) is disabled in
-		completefunc.
-		
-		Default value is 0.
-
-g:neocomplcache_lock_iminsert			*g:neocomplcache_lock_iminsert*
-		This variable is non 0, neocomplcache lock when 'iminsert' is
-		non zero.
-		
-		Default value is 0.
-
-g:neocomplcache_temporary_dir			*g:neocomplcache_temporary_dir*
+g:neocomplcache_temporary_dir				*g:neocomplcache_temporary_dir*
 		This variable appoints the directory that neocomplcache
 		begins to write a file at one time.  When there is not the
 		directory which appointed here, it is made.  For example,
 		keyword_complete.vim stores cache of the keyword in this
 		'keyword_cache' sub directory.
-		
+	
 		Default value is '~/.neocon'.
 
-g:neocomplcache_keyword_patterns		*g:neocomplcache_keyword_patterns*
+g:neocomplcache_keyword_patterns			*g:neocomplcache_keyword_patterns*
 		This dictionary records regular expression to recognize a
 		keyword pattern of the next than a cursor.  The form is the
 		same as|g:neocomplcache_keyword_patterns|.
-		
+	
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 >
@@ -397,105 +326,84 @@ g:neocomplcache_keyword_patterns		*g:neocomplcache_keyword_patterns*
 		endif
 		let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 <
-g:neocomplcache_next_keyword_patterns		*g:neocomplcache_next_keyword_patterns*
+g:neocomplcache_next_keyword_patterns			*g:neocomplcache_next_keyword_patterns*
 		This dictionary records keyword patterns to completion.
 		This is appointed in regular expression every file type.
-		
+	
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_omni_patterns			*g:neocomplcache_omni_patterns*
+g:neocomplcache_omni_patterns				*g:neocomplcache_omni_patterns*
 		This dictionary records keyword patterns to Omni completion.
 		This is appointed in regular expression every file type.
-		If this pattern is not defined, neocomplcache don't call
-		|omnifunc|. For example, ruby and php omnifunc are disabled,
-		because they are too slow.
-		
+	
 		Because it is complicated, refer to
-		s:source.initialize() autoload/neocomplcache/sources/omni_complete.vim
-		for the initial value.
+		neocomplcache#complfunc#omni_complete#initialize()
+		autoload/neocomplcache/complfunc/omni_complete.vim for the
+		initial value.
 >
 		" Examples:
 		if !exists('g:neocomplcache_omni_patterns')
 		let g:neocomplcache_omni_patterns = {}
 		endif
-		let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
-		let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-		let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-		let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+		let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
 <
-g:neocomplcache_tags_filter_patterns		*g:neocomplcache_tags_filter_patterns*
+g:neocomplcache_tags_filter_patterns			*g:neocomplcache_tags_filter_patterns*
 		This dictionary records  a pattern to filter a candidate in
 		the tag completion.  For example, it can exclude a candidate
 		beginning in _ in file type of C/C++.
-		
+	
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_same_filetype_lists		*g:neocomplcache_same_filetype_lists*
+g:neocomplcache_same_filetype_lists			*g:neocomplcache_same_filetype_lists*
 		It is a dictionary to connect file type mutually.  It is
 		effective at time to let you refer to c and cpp mutually.
-		
+	
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_dictionary_filetype_lists	*g:neocomplcache_dictionary_filetype_lists*
+g:neocomplcache_dictionary_filetype_lists		*g:neocomplcache_dictionary_filetype_lists*
 		It is a dictionary to connect a dictionary file with file
 		type.  The dictionary's key is filetype and comma-separated
 		multiple value is a path to a dictionary file.  If this
 		variable is empty, neocomplcache use 'dictionary' option.
-		When you set "text" key, you will appoint dictionary files in
-		text mode.
 		
 		Default value is {}.
 
-g:neocomplcache_dictionary_patterns		*g:neocomplcache_dictionary_patterns*
-		It is a dictionary to dictionary keyword patterns.  The
-		dictionary's key is filetype and value is keyword pattern.
-		If this variable is empty, neocomplcache use
-		|g:neocomplcache_keyword_patterns| option.
-		
-		Default value is {}.
-
-g:neocomplcache_context_filetype_lists		*g:neocomplcache_context_filetype_lists*
-		It is a dictionary to define context filetypes.
-		The item is a list of dictionary.
-		Note: g:neocomplcache_filetype_include_lists is deprecated name.
-		
-		The keys and values are below.
-		"filetype" : includes filetype name.
+g:neocomplcache_filetype_include_lists			*g:neocomplcache_filetype_include_lists*
+		It is a dictionary to define a filetype which includes another filetype.
+		The item is a list of dictionary. The keys and values are below.
+		"filetype" : includes filetype.
 		"start" : filetype start pattern.
 		"end" : filetype end pattern. You can use \1 to refer start's
 			matched pattern.
 >
 		" Examples:
-		if !exists('g:neocomplcache_context_filetype_lists')
-		let g:neocomplcache_context_filetype_lists = {}
+		if !exists('g:neocomplcache_filetype_include_lists')
+		let g:neocomplcache_filetype_include_lists= {}
 		endif
-		let g:neocomplcache_context_filetype_lists.perl6 =
-		\ [{'filetype' : 'pir', 'start' : 'Q:PIR\s*{', 'end' : '}'}]
-		let g:neocomplcache_context_filetype_lists.vim =
-		\ [{'filetype' : 'python', 'start' : '^\s*python <<\s*\(\h\w*\)', 'end' : '^\1'}]
+		let g:neocomplcache_filetype_include_lists.perl6 = [{'filetype' : 'pir', 'start' : 'Q:PIR\s*{', 'end' : '}'}]
+		let g:neocomplcache_filetype_include_lists.vim = 
+		\[{'filetype' : 'python', 'start' : '^\s*python <<\s*\(\h\w*\)', 'end' : '^\1'}]
 <
-		Because it is complicated, refer to neocomplcache#enable() in
-		autoload/neocomplcache.vim for the initial value.
-
-g:neocomplcache_text_mode_filetypes		*g:neocomplcache_text_mode_filetypes*
-		It is a dictionary to define text mode filetypes. The
-		dictionary's key is filetype and value is number.  If the value
-		is non-zero, this filetype is text mode.  In text mode,
-		neocomplcache supports writing English.
 		
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_ctags_program			*g:neocomplcache_ctags_program*
-		It is the path to the ctags command.  If this command is not
-		installed, include_complete is disabled.
+g:neocomplcache_disable_select_mode_mappings		*g:neocomplcache_disable_select_mode_mappings*
+		This variable control whether you invalidate Key-mappings of
+		Select-mode which snippets_complete performs.  You had
+		better usually validate it.
+		
+		Default value is 1.
+
+g:neocomplcache_ctags_program				*g:neocomplcache_ctags_program*
+		It is the path to the ctags command.
 		
 		Default value is "ctags".
 
-g:neocomplcache_ctags_arguments_list		*g:neocomplcache_ctags_arguments_list*
+g:neocomplcache_ctags_arguments_list			*g:neocomplcache_ctags_arguments_list*
 		It is the dictionary of the character string to set a value
 		to give as an argument of the commands when buffer_complete
 		and include_complete use a ctags command.  The dictionary's
@@ -504,125 +412,67 @@ g:neocomplcache_ctags_arguments_list		*g:neocomplcache_ctags_arguments_list*
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_include_paths			*g:neocomplcache_include_paths*
+g:neocomplcache_include_paths				*g:neocomplcache_include_paths*
 		It is the variable to enumerate path of the include file
 		every file type.  When there is not it, 'path' is used.
 		Refer to 'path' for the description form. It is the
 		dictionary of the character string that assumed file type a
 		key.
 		
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/include_complete.vim for the
+		Because it is complicated, refer to
+		neocomplcache#plugin#include_complete#initialize() in
+		autoload/neocomplcache/plugin/include_complete.vim for the
 		initial value.
-
-g:neocomplcache_include_exprs			*g:neocomplcache_include_exprs*
+                
+g:neocomplcache_include_exprs				*g:neocomplcache_include_exprs*
 		It is the expression string of the line analysis to perform
 		to acquire an include file name.  When there is not it,
 		'includeexpr' is used.  Refer to 'includeexpr' for the
 		description form. It is the dictionary of the character
 		string that assumed file type a key.
 		
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/include_complete.vim for the
+		Because it is complicated, refer to
+		neocomplcache#plugin#include_complete#initialize() in
+		autoload/neocomplcache/plugin/include_complete.vim for the
 		initial value.
-
-g:neocomplcache_include_patterns		*g:neocomplcache_include_patterns*
+                
+g:neocomplcache_include_patterns			*g:neocomplcache_include_patterns*
 		This variable appoints the pattern of the include command.
 		When there is not it, 'include' is used.  Refer to 'include'
 		for the description form. It is the dictionary of the
 		character string that assumed file type a key.
 		
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/include_complete.vim for the
+		Because it is complicated, refer to
+		neocomplcache#plugin#include_complete#initialize() in
+		autoload/neocomplcache/plugin/include_complete.vim for the
 		initial value.
 
-g:neocomplcache_include_functions		*g:neocomplcache_include_functions*
-		This variable appoints the function name of the include command.
-		When there is not it, ignored. It is the dictionary of the
-		function name string that assumed file type a key.
+g:neocomplcache_member_prefix_patterns			*g:neocomplcache_member_prefix_patterns*
+		This variable appoints a keyword pattern to complete a
+		member in include_complete and tags_complete.  This is
+		appointed in regular expression every file type.
 		
-		The function args are {lines} and {path}.
-		{lines} is the list of buffer lines.
-		{path} is the include path.
-		The return value is the list of include files.
-		
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/include_complete.vim for the
-		initial value.
-
-g:neocomplcache_include_max_processes		*g:neocomplcache_include_max_processes*
-		This variable appoints the max number of include processes.
-		When this variable is 0, include process will be disabled.
-		
-		Default value is 20.
-
-g:neocomplcache_filename_include_exprs		*g:neocomplcache_filename_include_exprs*
-		It is the expression string of the line analysis to perform
-		to substitute an include file name.  When there is not it,
-		ignored.  Refer to 'includeexpr' for the
-		description form. It is the dictionary of the character
-		string that assumed file type a key.
-		
-		Example: Perl
->
-		let g:neocomplcache_filename_include_exprs.perl =
-		\ 'fnamemodify(substitute(v:fname, "/", "::", "g"), ":r")'
-<
-		
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/filename_complete.vim for the
-		initial value.
-
-g:neocomplcache_filename_include_exts		*g:neocomplcache_filename_include_exts*
-		It is the list of include file name extensions. When there
-		is not it, all file name is used. It is the dictionary of
-		the list that assumed file type a key.
-		
-		Example: C++
->
-		let g:neocomplcache_filename_include_exts.cpp =
-		\ ['', 'h', 'hpp', 'hxx']
-<
-		Because it is complicated, refer to s:source.initialize() in
-		autoload/neocomplcache/sources/filename_complete.vim for the
-		initial value.
-
-g:neocomplcache_member_prefix_patterns		*g:neocomplcache_member_prefix_patterns*
-		This variable appoints a prefix pattern to complete a member
-		in buffer_complete.
-		This is appointed in regular expression every file type.
-		If filetype key is not set, disable member completion.
-		
-		Because it is complicated, refer in
-		autoload/neocomplcache/sources/buffer_complete.vim for the
-		initial value.
-
-g:neocomplcache_member_patterns			*g:neocomplcache_member_patterns*
-		This variable appoints a keyword pattern to complete a member
-		in buffer_complete.
-		This is appointed in regular expression every file type.
-		If filetype key is not set, use filetype "default" setting.
-		
-		Because it is complicated, refer in
-		autoload/neocomplcache/sources/buffer_complete.vim for the
-		initial value.
-
-g:neocomplcache_delimiter_patterns		*g:neocomplcache_delimiter_patterns*
-		This variable appoints a delimiter pattern to smart complete a
-		function.  This is appointed in regular expression's string
-		list every file type.
->
-		" Examples:
-		if !exists('g:neocomplcache_delimiter_patterns')
-		let g:neocomplcache_delimiter_patterns= {}
-		endif
-		let g:neocomplcache_delimiter_patterns.vim = ['#']
-		let g:neocomplcache_delimiter_patterns.cpp = ['::']
-<
 		Because it is complicated, refer to neocomplcache#enable() in
 		autoload/neocomplcache.vim for the initial value.
 
-g:neocomplcache_omni_functions			*g:neocomplcache_omni_functions*
+g:neocomplcache_delimiter_patterns			*g:neocomplcache_delimiter_patterns*
+		This variable appoints a delimiter pattern to smart complete a
+		function.  This is appointed in regular expression's string
+		list every file type.
+		
+		Because it is complicated, refer to neocomplcache#enable() in
+		autoload/neocomplcache.vim for the initial value.
+
+g:neocomplcache_quick_match_patterns			*g:neocomplcache_quick_match_patterns*
+		This option records an input pattern to display a quick
+		match list.  This is appointed in regular expression to
+		match the end of the input character string every file type.
+		You can set default input patterns when you appoint
+		'default'.
+		
+		Default value is { 'default' : '-' }.
+
+g:neocomplcache_omni_functions				*g:neocomplcache_omni_functions*
 		This dictionary which appoints |omni_complete| call
 		function.  The key is |&filetype|. If
 		g:neocomplcache_omni_function_list[|&filetype|] is
@@ -630,7 +480,7 @@ g:neocomplcache_omni_functions			*g:neocomplcache_omni_functions*
 		
 		Default value is {}.
 
-g:neocomplcache_vim_completefuncs		*g:neocomplcache_vim_completefuncs*
+g:neocomplcache_vim_completefuncs			*g:neocomplcache_vim_completefuncs*
 		This dictionary which appoints |vim_complete| call function
 		when completes custom and customlist command.  The key is
 		command name. The value is function name.
@@ -641,58 +491,47 @@ g:neocomplcache_vim_completefuncs		*g:neocomplcache_vim_completefuncs*
 		endif
 		let g:neocomplcache_vim_completefuncs.Ref = 'ref#complete'
 <
+		
 		Default value is {}.
-
-g:neocomplcache_source_disable			*g:neocomplcache_source_disable*
+                
+g:neocomplcache_plugin_disable				*g:neocomplcache_plugin_disable*
 		The dictionary which appoints whether you invalidate a
-		source. With a source name as a key, it becomes invalid by
-		making a value 1.
-		Note: g:neocomplcache_plugin_disable is deprecated name.
+		complete function and plugin.  With a complete function and
+		plugin name as a key, it becomes invalid by making a value
+		1.  Because neocomplcache refer this option when
+		neocomplcache initialize, it is necessary to appoint it
+		before initialization.
 		
 		Default value is {}.
 
-g:neocomplcache_source_completion_length	*g:neocomplcache_source_completion_length*
-		It is a dictionary to control each source's completion
-		length.  For example, you can prolong heavy source's
+g:neocomplcache_plugin_completion_length		*g:neocomplcache_plugin_completion_length*
+		It is a dictionary to control each plugin's completion
+		length.  For example, you can prolong heavy plugin's
 		completion length.
-		Note: g:neocomplcache_plugin_completion_length is deprecated name.
 		
 		Default value is {}.
 
-g:neocomplcache_source_rank			*g:neocomplcache_source_rank*
-		It is a dictionary to control each source's completion
+g:neocomplcache_plugin_rank				*g:neocomplcache_plugin_rank*
+		It is a dictionary to control each plugin's completion
 		priority.
-		Note: g:neocomplcache_plugin_rank is deprecated name.
 		
-		Default value is set by each sources.
-
-g:neocomplcache_force_overwrite_completefunc	*g:neocomplcache_force_overwrite_completefunc*
-		If this variable is 1, neocomplcache force overwrite
-		'completefunc' option. This variable is useful for other
-		plugin overwrite 'completefunc'.  But other plugin's
-		'completefunc' is disabled.
-		
-		Default value is 0.
-
-g:neocomplcache_release_cache_time		*g:neocomplcache_release_cache_time*
-		This variable defines time of automatic released cache by a second unit.
-		
-		Default value is 900.
+		Default value is set by each plugins.
 
 ------------------------------------------------------------------------------
-KEY MAPPINGS 					*neocomplcache-key-mappings*
+KEY MAPPINGS 						*neocomplcache-key-mappings*
 
-neocomplcache#start_manual_complete([{sources}])
-						*neocomplcache#start_manual_complete()*
-		Use this function on inoremap <expr>.  The keymapping call the
-		completion of neocomplcache.  When you rearrange the completion
-		of the Vim standard, you use it.
-		If you give {sources} argument, neocomplcache call {sources}.
-		{sources} is name of source or list of sources name.
->
-		inoremap <expr><Tab>  neocomplcache#start_manual_complete()
-<
-neocomplcache#manual_filename_complete()	*neocomplcache#manual_filename_complete()*
+<Plug>(neocomplcache_snippets_expand)			*<Plug>(neocomplcache_snippets_expand)*
+		Expand a snippet of plural lines. When there is not snippet,
+		jump to the next placeholder.  The snippet which unfolded is
+		easy to become display by the high rank so that a rank
+		rises.
+
+<Plug>(neocomplcache_snippets_jump)			*<Plug>(neocomplcache_snippets_jump)*
+		Jump to the next place holder. Do not expand snippet.  When
+		you do not want to expand a snippet name, use this
+		keymapping.
+
+neocomplcache#manual_filename_complete			*neocomplcache#manual_filename_complete*
 		Use this function on inoremap <expr>.  The keymapping call
 		the file name completion of neocomplcache.  When you
 		rearrange the file name completion of the Vim standard, you
@@ -700,59 +539,46 @@ neocomplcache#manual_filename_complete()	*neocomplcache#manual_filename_complete
 >
 		inoremap <expr><C-x><C-f>  neocomplcache#manual_filename_complete()
 <
-neocomplcache#manual_omni_complete()		*neocomplcache#manual_omni_complete()*
+neocomplcache#manual_omni_complete			*neocomplcache#manual_omni_complete*
 		Use this function on inoremap <expr>.  The keymapping call
 		the omni completion of neocomplcache.  When you rearrange
 		the omni completion of the Vim standard, you use it.
 >
 		inoremap <expr><C-j>  neocomplcache#manual_filename_complete()
 <
-neocomplcache#manual_keyword_complete()		*neocomplcache#manual_keyword_complete()*
+neocomplcache#manual_keyword_complete			*neocomplcache#manual_keyword_complete*
 		Use this function on inoremap <expr>.  The keymapping call
 		keyword completion of neocomplcache.  When you rearrange the
 		keyword completion of the Vim standard, you use it.
 >
 		inoremap <expr><C-n>  pumvisible() ? "\<C-n>" : neocomplcache#manual_keyword_complete()
 
-neocomplcache#close_popup()			*neocomplcache#close_popup()*
+neocomplcache#close_popup				*neocomplcache#close_popup*
 		Inset candidate and close popup menu for neocomplcache.
 >
 		inoremap <expr><C-y>  neocomplcache#close_popup()
 <
-neocomplcache#cancel_popup()			*neocomplcache#cancel_popup()*
+neocomplcache#cancel_popup()				*neocomplcache#cancel_popup()*
 		cancel completion menu for neocomplcache.
 >
 		inoremap <expr><C-e>  neocomplcache#cancel_popup()
 <
-neocomplcache#smart_close_popup()		*neocomplcache#smart_close_popup()*
-		Inset candidate and close popup menu for neocomplcache.
-		Unlike|neocomplcache#close_popup()|, this function changes
-		behavior by|g:neocomplcache_enable_auto_select|smart.
-
-neocomplcache#undo_completion()			*neocomplcache#undo_completion()*
-		Use this function on inoremap <expr>. Undo inputed
+neocomplcache#undo_completion				*neocomplcache#undo_completion*
+		Use this function on inoremap <expr>.  Undo inputed
 		candidate.  Because there is not mechanism to cancel
 		candidate in Vim, it will be convenient when it inflects.
 >
 		inoremap <expr><C-g>     neocomplcache#undo_completion()
 <
-neocomplcache#complete_common_string()		*neocomplcache#complete_common_string()*
-		Use this function on inoremap <expr>. Complete common
+neocomplcache#complete_common_string()			*neocomplcache#complete_common_string()*
+		Use this function on inoremap <expr>.  Complete common
 		string in candidates. It will be convenient when candidates
 		have long common string.
 >
 		inoremap <expr><C-l>     neocomplcache#complete_common_string()
 <
-<Plug>(neocomplcache_start_unite_complete)		*<Plug>(neocomplcache_start_unite_complete)*
-		Start completion with |unite|.
-		Note: Required unite.vim Latest ver.3.0 or above.
-
-<Plug>(neocomplcache_start_unite_quick_match)		*<Plug>(neocomplcache_start_quick_match)*
-		Start completion with |unite| and start quick match mode.
-		Note: Required unite.vim Latest ver.3.0 or above.
-
 ==============================================================================
-EXAMPLES					*neocomplcache-examples*
+EXAMPLES						*neocomplcache-examples*
 >
 	" Disable AutoComplPop.
 	let g:acp_enableAtStartup = 0
@@ -782,1516 +608,112 @@ EXAMPLES					*neocomplcache-examples*
 	let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 	
 	" Plugin key-mappings.
+	imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+	smap <C-k>     <Plug>(neocomplcache_snippets_expand)
 	inoremap <expr><C-g>     neocomplcache#undo_completion()
 	inoremap <expr><C-l>     neocomplcache#complete_common_string()
 	
 	" Recommended key-mappings.
 	" <CR>: close popup and save indent.
-	inoremap <expr><CR>  neocomplcache#close_popup() . "\<CR>"
+	inoremap <expr><CR>  (pumvisible() ? "\<C-y>":'') . "\<C-f>\<CR>X\<BS>"
 	" <TAB>: completion.
 	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 	" <C-h>, <BS>: close popup and delete backword char.
-	inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-	inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+	inoremap <expr><C-h> pumvisible() ? neocomplcache#close_popup()."\<C-h>" : "\<C-h>"
+	inoremap <expr><BS> pumvisible() ? neocomplcache#close_popup()."\<C-h>" : "\<C-h>"
 	inoremap <expr><C-y>  neocomplcache#close_popup()
 	inoremap <expr><C-e>  neocomplcache#cancel_popup()
 	
-	" For cursor moving in insert mode(Not recommended)
-	"inoremap <expr><Left>  neocomplcache#close_popup() . "\<Left>"
-	"inoremap <expr><Right> neocomplcache#close_popup() . "\<Right>"
-	"inoremap <expr><Up>    neocomplcache#close_popup() . "\<Up>"
-	"inoremap <expr><Down>  neocomplcache#close_popup() . "\<Down>"
-	" Or set this.
-	"let g:neocomplcache_enable_cursor_hold_i = 1
-	" Or set this.
-	"let g:neocomplcache_enable_insert_char_pre = 1
-	
 	" AutoComplPop like behavior.
 	"let g:neocomplcache_enable_auto_select = 1
-	
-	" Shell like behavior(not recommended).
-	"set completeopt+=longest
-	"let g:neocomplcache_enable_auto_select = 1
-	"let g:neocomplcache_disable_auto_complete = 1
-	"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-	"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-	
-	" Enable omni completion.
-	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-	
-	" Enable heavy omni completion.
-	if !exists('g:neocomplcache_omni_patterns')
-	  let g:neocomplcache_omni_patterns = {}
-	endif
-	let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
-	"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-	let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-	let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-	let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-	
-	" For perlomni.vim setting.
-	" https://github.com/c9s/perlomni.vim
-	let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+	"inoremap <expr><CR>  (pumvisible() ? "\<C-e>":'') . (&indentexpr != '' ? "\<C-f>\<CR>X\<BS>":"\<CR>")
+	"inoremap <expr><C-h> pumvisible() ? neocomplcache#cancel_popup()."\<C-h>" : "\<C-h>"
+	"inoremap <expr><BS> pumvisible() ? neocomplcache#cancel_popup()."\<C-h>" : "\<C-h>"
 <
 ==============================================================================
-SOURCES						*neocomplcache-sources*
+PLUGINS							*neocomplcache-plugins*
 
-Neocomplcache reads automatically sources saved in an
-autoload/neocomplcache/sources directory.
+In this clause, I comment on plug in attached to neocomplcache.
+Neocomplcache reads automatically the plugin saved in an
+autoload/neocomplcache/plugin directory.
 
-keyword_complete.vim				*keyword_complete*
-		This source collects keywords from dictionaries... etc, and to
-		use for completion.  Because the plugin offer the basic
-		function of neocomplcache, neocomplcache does not work normally
-		when you delete this plugin.
+buffer_complete.vim					*buffer_complete*
+		This plugin will collect keywords from buffers and
+		dictionaries, and to use for completion.  Because the plugin
+		offer the basic function of neocomplcache, neocomplcache
+		does not work normally when you delete this plugin.
 
-buffer_complete.vim				*buffer_complete*
-		This source collects keywords from buffer.
+snippets_complete.vim					*snippets_complete*
+		This plugin will use snippet files for completion.  The
+		plugin offer a function similar with snipMate.vim and
+		snippetsEmu.vim.  Because you can search a snippet with a
+		function of neocomplcache, you may omit trouble to learn.
 
-member_complete.vim				*member_complete*
-		This source collects use of member variables from buffer.
-
-tags_complete.vim				*tags_complete*
-		This source analyzes a tag file defined in 'tags' for
+tags_complete.vim					*tags_complete*
+		This plugin will use a tag file defined in 'tags' for
 		completion.  When a huge tag file is set, neocomplcache
 		don't make cache if you don't execute
-		|:NeoComplCacheCachingTags|command.  Because
-		tags_complete is too slow if tags_complete read a big
-		tags file.  You should use more convenient include
-		completion now.
+		|:NeoComplCacheCachingTags|command.  Because tags_complete
+		is too slow if tags_complete read a big tags file. 
+		You should use more convenient include completion now.
 
-syntax_complete.vim				*syntax_complete*
-		This source analyzes a syntax file like
-		autoload/syntaxcomplete.vim offered by default, and to
-		add to candidate completion.  The plugin can recognize
+syntax_complete.vim					*syntax_complete*
+		This plugin will analyze a syntax file like
+		autoload/syntaxcomplete.vim offered by default, and to add
+		to candidate completion.  The plugin can recognize
 		candidates a lot more than autoload/syntaxcomplete.vim.
 
-include_complete.vim				*include_complete*
-		This source will add the file which an opening buffer
-		refers to to candidate.  It is convenient, because you do
-		not need to prepare a tags file and a dictionary file.
-		But it is necessary for 'path' and 'include',
-		'includeexpr' to be set adequately. If vimproc is installed,
-		neocomplcache will cache. But if not installed, auto caching
-		feature is disabled. Please execute
-		|:NeoComplCacheCachingInclude| manually.
+include_complete.vim					*include_complete*
+		This plugin will add the file which an opening buffer refers
+		to to candidate.  It is convenient, because you do not need
+		to prepare a tags file and a dictionary file.  But it is
+		necessary for 'path' and 'include', 'includeexpr' to be set
+		adequately.
  
-vim_complete.vim				*vim_complete*
-		This source analyzes context and start Omni completion of
-		Vim script.  This plugin does not work other than editing
-		time of Vim script.  I created it because neocomplcache
-		cannot call |i_CTRL-X_CTRL-V|.  Local variable and a
-		script variable, a function and the analysis of the
+vim_complete.vim					*vim_complete*
+		An experimental function. This plugin analyzes context and
+		start Omni completion of VimScript.  This plugin does not
+		work other than editing time of VimScript.  I made it
+		because neocomplcache cannot call |i_CTRL-X_CTRL-V|.  It is
+		an aim to do to the thing which is higher-performance than
+		the completion prepared for by default.  Local variable and
+		a script variable, a function and the analysis of the
 		command are implemented now.
 
-dictionary_complete.vim				*dictionary_complete*
-		This source adds candidates from 'dictionary' or
-		|g:neocomplcache_dictionary_filetype_lists|.
+dictionary_complete.vim					*dictionary_complete*
+		
 
-filename_complete.vim				*filename_complete*
-		This source collects filename candidates. It is useful
-		when you input header file name.  It recognizes include
-		pattern and include path like include_complete.
+filename_complete.vim					*filename_complete*
+		
 
-omni_complete.vim				*omni_complete*
-		This source calls 'omnifunc' automatically when cursor
-		text is matched with |g:neocomplcache_omni_patterns|. If
-		|g:neocomplcache_omni_function_list|is defined,
-		neocomplcache will give priority it.
+omni_complete.vim					*omni_complete*
+		
 
-completefunc_complete.vim			*completefunc_complete*
-		This source collects candidates from any 'completefunc'.
-		But it is incomplete.
-		neocomplcache#sources#completefunc_complete#call_completefunc(funcname)
-		is only available. This function calls any 'completefunc'
-		manually.
+completefunc_complete.vim				*completefunc_complete*
+		
 
-abbrev_complete.vim				*abbrev_complete*
-		This source collects candidates from abbrev.
+spell_complete.vim					*spell_complete*
+		
 
-------------------------------------------------------------------------------
-USER SOURCES 					*neocomplcache-user-sources*
-
-This section, introduce non default neocomplcache sources.
-
-snippets_complete.vim				*neocomplcache-sources-snippets_complete*
-		This source is for snippets completion.
-		Note: This source is not in default sources after neocomplcache
-		ver.7.0.
-		https://github.com/Shougo/neocomplcache-snippets-complete
-
-neco-ghc					*neocomplcache-sources-neco-ghc*
-		https://github.com/ujihisa/neco-ghc
-		eagletmt originally implemented and now ujihisa is maintaining
-		this source.  It completes a source file written in Haskell.
-		It requires ghc-mod <http://www.mew.org/~kazu/proj/ghc-mod/>.
-
-neco-ruby					*neocomplcache-sources-neco-ruby*
-		https://github.com/ujihisa/neco-ruby
-		This source is for ruby completion.  Only require_relative
-		completion is implemented so far.
+abbrev_complete.vim					*abbrev_complete*
+		
 
 ==============================================================================
-UNITE SOURCES					*neocomplcache-unite-sources*
-
-						*neocomplcache-unite-source-neocomplcache*
-neocomplcache
-		Nominates neocomplcache completion candidates. The kind is "completion".
-		This source is used in |<Plug>(neocomplcache_start_unite_complete)|.
->
-		imap <C-k>  <Plug>(neocomplcache_start_unite_complete)
-		imap <C-q>  <Plug>(neocomplcache_start_unite_quick_match)
-<
-==============================================================================
-CREATE SOURCE					*neocomplcache-create-source*
-
-In this clause, I comment on a method to make source of neocomplcache.  The
-ability of neocomplcache will spread by creating source by yourself.
-
-Todo
+TODO							*neocomplcache-todo*
 
 ==============================================================================
-CHANGELOG					*neocomplcache-changelog*
+BUGS							*neocomplcache-bugs*
 
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 7.0:
+==============================================================================
+CREATE PLUGIN						*neocomplcache-create-plugin*
 
-2012-05-04
-- Fixed command definition.
-- Ver.7.0.
+In this clause, I comment on a method to make plugin of neocomplcache.  The
+ability of neocomplcache will spread by creating plugin by yourself.
 
-2012-05-03
-- Improved make cache behavior.
+==============================================================================
+CHANGELOG						*neocomplcache-changelog*
 
-2012-05-02
-- Updated examples.
-- Added g:neocomplcache_lock_iminsert option.
-
-2012-04-28
-- Updated vital.
-
-2012-04-24
-- Fixed make cache bug.
-
-2012-04-22
-- Improved member_complete behavior.
-- Improved buffer_complete behavior.
-- Improved omni_complete behavior.
-
-2012-04-20
-- Fixed feedkeys() problem.
-
-2012-04-10
-- Improved escape filename.
-- Improved sudo check.
-
-2012-04-05
-- Improved cache event.
-
-2012-04-02
-- Improved documentation.
-- Fixed asyncronous cache bug.
-
-2012-03-31
-- Changed g:neocomplcache_enable_prefetch default value.
-- Improved asyncronous caching check timing.
-- Fixed caching.
-- Supported Ctrl-x mode fix.
-
-2012-03-27
-- Fixed g:neocomplcache_enable_fuzzy_completion documentaion.
-- Added g:neocomplcache_fuzzy_completion_start_length option.
-
-2012-03-26
-- Fixed filename escape.
-- Fixed vim keyword pattern.
-
-2012-03-25
-- Fixed filename_complete behavior.
-
-2012-03-23
-- Fixed g:neocomplcache_enable_cursor_hold_i behavior.
-
-2012-03-21
-- Improved filename pattern.
-
-2012-03-15
-- Fixed get_cur_text().
-
-2012-03-13
-- Fixed vb keyword pattern.
-
-2012-03-10
-- Fixed cur_text bug.
-
-2012-03-07
-- Fixed bell problem.
-- Deleted snippet source.
-- Fixed get_cur_text().
-- Improved completion source.
-- Updated vital.
-
-2012-03-06
-- Fixed Vim search.
-- Improved temporary directory behavior.
-
-2012-03-05
-- Fixed asynchronous load.
-- Fixed expand().
-- Improved version check.
-- Enabled beep.
-- Improved cache behavior.
-
-2012-03-04
-- Improved filename escape.
-- Improved asyncronous caching behavior.
-
-2012-03-03
-- Fixed temporary directory initialization.
-
-2012-02-24
-- Improved auto caching.
-- Fixed filetype error in dictionary_complete source.
-
-2012-02-23
-- Improved :NeoComplCacheToggle behavior.
-- Updated vital.
-
-2012-02-22
-- Updated vital.
-
-2012-02-20
-- Fixed for g:neocomplcache_enable_prefetch default value.
-
-2012-02-17
-- Improved context filetype.
-
-2012-02-16
-- Changed g:neocomplcache_manual_completion_start_length default value.
-- Fixed abbr error in vim_complete source.
-- Improved filter behavior.
-
-2012-02-15
-- Improved snippets_complete changes description.
-- Warning if using obsolute mappings.
-- Check device file in filename_complete.
-
-2012-02-14
-- Improved helper function.
-
-2012-02-12
-- Deleted vimshell omni fuction pattern.
-
-2012-02-11
-- Fixed on_insert_enter().
-- Fixed cur_text check.
-- Fixed completion bug.
-- Improved omnifunc error detection.
-- Refactored is_windows.
-
-2012-02-10
-- Improved g:neocomplcache_cursor_hold_i_time behavior.
-- Improved Vim version check.
-- Added g:neocomplcache_enable_insert_char_pre option.
-- Do not set refresh key.
-
-2012-02-08
-- Improved fuzzy completion behavior.
-
-2012-02-06
-- Improved buffer_complete.
-- Fixed save cache error.
-
-2012-02-05
-- Improved include_complete.
-- Fixed buffer_complete cache problem.
-- Fixed documentaion.
-- Fixed changed buffer problem.
-
-2012-02-04
-- Renamed g:neocomplcache_plugin_disable as g:neocomplcache_source_disable.
-- Renamed g:neocomplcache_plugin_rank as g:neocomplcache_source_rank.
-- Renamed g:neocomplcache_plugin_completion_length as g:neocomplcache_source_completion_length.
-- Revised documentation.
-- Added :NeoComplCacheLockSource and :NeoComplCacheUnLockSource commands.
-- Renamed g:neocomplcache_filetype_include_lists as g:neocomplcache_context_filetype_lists.
-- Added g:neocomplcache_release_cache_time option.
-- Implemented release cache in include_complete.
-- Deleted local var_dictionary completion in vim_complete.
-
-2012-02-02
-- Ver.7.0 development is started.
-- Splited snippets_complete.
-- Deleted Japanese documentation.
-- Improved documentation.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 6.2:
-
-2012-01-31
-- Set :scriptencoding.
-
-2012-01-27
-- Changed default plugins rank.
-- Improved g:neocomplcache_enable_prefetch behavior.
-- Fixed for eskk.
-
-2012-01-24
-- Fixed feedkeys().
-- Supported php interpreter.
-
-2012-01-20
-- Fixed for eskk.
-- Fixed dictionary_complete behavior.
-
-2012-01-18
-- Fixed prefetch problem.
-
-2012-01-17
-- Improved documentation.
-
-2012-01-15
-- Changed syntax highlight name.
-- Improved syntax_complete caching behavior.
-
-2012-01-14
-- Added <Nop> in vim_complete.
-
-2012-01-05
-- Fixed filename complete escape.
-- Fixed expand() problem.
-- Fixed filename include complete.
-
-2012-01-04
-- Improved cache check.
-
-2012-01-02
-- Improved vim_complete.
-
-2011-12-26
-- Fixed updatetime problem.
-
-2011-12-22
-- Force use glob().
-
-2011-12-20
-- Fixed overwrite manual complete.
-- Improved cache.
-
-2011-12-19
-- Fixed path separator error.
-- Fixed vim keyword pattern.
-- Applied omni_complete patch(experimental).
-
-2011-12-18
-- Check if "vim" command is executable.
-
-2011-12-17
-- Improved expand home.
-
-2011-12-15
-- Improved snippet eval.
-
-2011-12-14
-- Fixed Vim keyword pattern.
-
-2011-12-03
-- Improved tex keyword pattern.
-
-2011-11-30
-- Deleted obsolute learning.
-- Fixed for refresh always problem(experimental).
-
-2011-11-29
-- Improved for learning.
-
-2011-11-27
-- Fixed expand snippet.
-
-2011-11-25
-- Fixed conceal syntax.
-
-2011-11-24
-- Supported conceal feature in snippet_complete(experimental).
-
-2011-11-23
-- Fixed tex snippets.
-
-2011-11-21
-- Added neocomplcache#sources#include_complete#get_current_include_files().
-- Improved snippets_complete rank.
-- Improved tex snippets.
-
-2011-11-16
-- Improved unite#sources#snippet#start_complete()
-
-2011-11-14
-- Improved async from tags.
-
-2011-11-13
-- Fixed autocmd args error.
-
-2011-11-11
-- Use vital.vim cache module.
-
-2011-11-08
-- Fixed g:neocomplcache_text_mode_filetypes default value.
-
-2011-11-07
-- Added vim snippet.
-
-2011-11-06
-- Fixed unite source.
-
-2011-11-05
-- Fixed icase in text mode.
-
-2011-11-04
-- Fixed php snippet.
-- Fixed snippet description.
-- Improved unite#sources#neocomplcache#start_complete() behavior.
-- Added <Plug>(neocomplcache_start_unite_quick_match) mapping.
-- Improved documentation.
-- Use sandbox in eval snippet.
-- Fixed for gdefault option.
-
-2011-11-03
-- Improved a bit.
-
-2011-10-31
-- Fixed examples.
-- Fixed filter.
-- Improved c snippet.
-
-2011-10-28
-- Fixed remove_next_keyword.
-- Improved python keyword pattern.
-- Improved eval snippet behavior.
-
-2011-10-27
-- Added neocomplcache#util#get_last_status() function.
-
-2011-10-25
-- Fixed member_complete.
-- Fixed fuzzy completion error.
-
-2011-10-23
-- Added g:neocomplcache_enable_fuzzy_completion option.
-- Fixed file_include source.
-- Improved filename_complete.
-- Supported nyaos.
-
-2011-10-22
-- Improved documentation.
-
-2011-10-18
-- Fixed Japanese documentation.
-
-2011-10-17
-- Fixed d snippets.
-- Improved snippets delete behavior.
-
-2011-10-16
-- Improved filename_complete.
-- Improved default rank.
-- Improved filename_complete mark.
-- Improved filename_complete parse include.
-- Added g:neocomplcache_filename_include_exts option.
-- Added g:neocomplcache_filename_include_exprs option.
-- Added documentation.
-- Added g:neocomplcache_include_functions option.
-
-2011-10-15
-- Fixed css omni completion pattern.
-
-2011-10-14
-- Fixed filter.
-- Improved calc frequencies.
-- Fixed neocomplcache#sources#snippets_complete#get_snippets().
-- Improved neocomplcache#get_source_filetypes().
-
-2011-10-13
-- Fixed for IM Problem.
-- Fixed for g:neocomplcache_enable_auto_select.
-- Improved filtering behavior.
-- Detect sudo vim.
-- Fixed restore completefunc problem.
-
-2011-10-11
-- Fixed for Vim 7.2.
-- Fixed omni_complete preview window.
-
-2011-10-10
-- Fixed variables initialize.
-- Deleted g:neocomplcache_force_caching_buffer_name_pattern option.
-- Deleted g:neocomplcache_disable_auto_select_buffer_name_pattern option.
-- Renamed g:neocomplcache_max_filename_width to g:neocomplcache_max_menu_width.
-- Added neocomplcache#start_manual_complete().
-- Fixed auto complete behavior.
-
-2011-10-09
-- Fixed include_complete error.
-- Fixed finalize error.
-- Added C++11 snippets.
-
-2011-10-07
-- Improved syntax_complete caching.
-- Improved g:neocomplcache_enable_prefetch behavior.
-- Changed g:neocomplcache_enable_prefetch behavior default value.
-- Improved some snippets.
-
-2011-10-05
-- Fixed filename_complete.
-
-2011-10-04
-- Added member_complete source.
-
-2011-10-01
-- Supported info in omni_complete.
-
-2011-09-29
-- Fixed php snippet.
-
-2011-09-27
-- Improved mappings dictionary.
-
-2011-09-26
-- Improved vim_complete variables anaylze.
-
-2011-09-24
-- Fixed member complete.
-- Added g:neocomplcache_member_patterns option.
-- Fixed setline() problem.
-- Supported Rhino.
-
-2011-09-23
-- Fixed buffer_complete bug.
-
-2011-09-22
-- Fixed for Vim 7.3.319.
-- Fixed member completion.
-
-2011-09-21
-- Added tcl support.
-- Improved examples.
-- Fixed omni_complete.
-- Improved javascript snippets.
-- Fixed member completion check.
-
-2011-09-19
-- Refactored local variable names.
-
-2011-09-18
-- Disabled refresh by resolved repeat-register problem.
-
-2011-09-16
-- Fixed prefetch.
-- Improved caching current line.
-- Added neocomplcache print debug message.
-
-2011-09-15
-- Improved prefetch.
-- Supported Vim 7.3.311.
-
-2011-09-14
-- Fixed cur_keyword_pos problem.
-
-2011-09-13
-- Re-implemented neocomplcache#start_manual_complete().
-
-2011-09-12
-- Fixed g:neocomplcache_enable_prefetch behavior.
-
-2011-09-10
-- Improved g:neocomplcache_enable_prefetch behavior.
-
-2011-09-09
-- Added g:neocomplcache_enable_prefetch option.
-- Fixed text mode.
-
-2011-09-08
-- Improved text mode.
-
-2011-09-06
-- Improved caching buffer.
-- Fixed neocomplcache#get_complete_results_pos().
-- Fixed filename_complete.
-
-2011-09-03
-- Added g:neocomplcache_compare_function option.
-- Fixed modifiable error.
-- Improved check im.
-
-2011-09-01
-- Fixed ruby omni complete default pattern.
-- Use unite#start_complete().
-- Fixed restore function.
-- Fixed for rubycomplete.vim.
-- Fixed auto select.
-- Improved filename_complete behavior.
-
-2011-08-31
-- Fixed get member list error.
-
-2011-08-30
-- Refactoringed.
-- Fixed auto complete flicker.
-- Improved gather candidates interface.
-- Supported complete_check().
-
-2011-08-29
-- Fixed warning.
-- Fixed detect completefunc.
-- Fixed auto select.
-- Deleted obsolute features.
-- Fixed s:cur_keyword_str.
-- Refactoringed.
-
-2011-08-28
-- Supported Vim 7.3.289.
-- Deleted quick match feature.
-
-2011-08-26
-- Ver.6.2 development is started.
-- Fixed include_complete error.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 6.1:
-
-2011-08-20
-- Improved warning message.
-- Released Ver.6.1.
-
-2011-08-12
-- Fixed tag caching error.
-
-2011-08-09
-- Improved include filename complete.
-- Deleted underbar completion enhancements.
-- Improved default keyword patterns.
-- Fixed path search.
-- Substitute "namespace foobar" to "foobar <namespace>".
-- Improved asyncronous tags caching.
-
-2011-08-08
-- Added g:neocomplcache_include_max_processes option.
-- Improved filename_complete.
-- Improved async tags.
-- Fixed include complete caching.
-
-2011-08-06
-- Optimized dictionary filter.
-
-2011-08-05
-- Fixed tags caching error.
-
-2011-08-04
-- Added :NeoComplCacheCachingSnippets command.
-
-2011-08-03
-- Improved neocomplcache#get_syn_name().
-- Fixed check uname.
-- Improved filename_complete.
-
-2011-08-02
-- Fixed include_complete caching.
-
-2011-08-01
-- Improved cache loading.
-- Improved vim_complete.
-
-2011-07-31
-- Fixed get_cur_text error.
-- Improved syntax_complete cache.
-
-2011-07-23
-- Fixed vim_complete error.
-
-2011-07-22
-- Fixed asyncronous caching bug.
-- Added :NeoComplCacheLockPlugin and :NeoComplCacheUnlockPlugin commands.
-- Don't use swapfile in asyncronous caching.
-- Fixed filename_complete.
-
-2011-07-21
-- Fixed keyword pattern.
-
-2011-07-20
-- Fixed include_complete error.
-
-2011-07-18
-- Disabled auto caching in include_complete when vimproc is not installed.
-
-2011-07-17
-- Added g:neocomplcache_dictionary_patterns option.
-- Changed keyword_pattern(experimental).
-
-2011-07-16
-- Improved python include filetype.
-
-2011-07-15
-- Fixed php delimiter pattern.
-
-2011-07-14
-- Fixed include_complete freeze in Windows environment.
-
-2011-07-13
-- Improved include_complete source caching timing.
-
-2011-07-12
-- Optimized memory usage.
-- Supported coq keyword pattern.
-- Implemented asyncronous caching in tags_complete.
-- Implemented asyncronous caching in include_complete.
-
-2011-07-11
-- Renamed g:neocomplcache_snippets_complete_disable_runtime_snippets to g:neocomplcache_snippets_disable_runtime_snippets.
-
-2011-07-10
-- Fixed doc.
-- Enabled auto-preview.
-- Added g:neocomplcache_snippets_complete_disable_runtime_snippets option.
-
-2011-07-09
-- Supported vcs.vim.
-- Added g:neocomplcache_force_overwrite_completefunc option.
-- Fixed unite source error.
-
-2011-07-07
-- Improved underbar completion.
-- Fixed neocomplcache#check_match_filter() behavior.
-
-2011-07-05
-- Improved underbar completion.
-
-2011-06-30
-- Improved execute completion.
-- Improved autocmd completion.
-- Improved mapping completion.
-- Fixed vim_complete.
-- Improved help include filetype.
-
-2011-06-28
-- Changed g:neocomplcache_enable_cursor_hold_i behavior.
-- Deleted obsolute variable.
-
-2011-06-25
-- Improved variable analyze.
-
-2011-06-23
-- Set tabstop in ftplugin/snippet.vim.
-
-2011-06-22
-- Fixed dictionary_complete.
-
-2011-06-21
-- Fixed is_text_mode.
-
-2011-06-20
-- Fixed dictionary_complete behavior.
-- Improved neocomplcache#get_source_filetypes().
-
-2011-06-16
-- Supported earthquake.
-
-2011-06-15
-- Changed caching timing.
-
-2011-06-14
-- Improved snippets_complete highlights.
-
-2011-06-12
-- Fixed load_from_tags() error.
-
-2011-06-11
-- Improved neocomplcache documentation.
-- Fixed snippets expand behavior.
-
-2011-06-10
-- Improved snippets_complete.
-- Vitalized.
-- Fixed menu problem.
-
-2011-06-09
-- Fixed g:snips_author problem.
-
-2011-06-08
-- Fixed filename_complete error.
-- Improved snippets action pattern.
-
-2011-06-07
-- Improved snippet_complete.
-- Improved snippet unite source.
-- Improved snippet source description.
-
-2011-06-03
-- Fixed filename_complete.
-
-2011-06-02
-- Supported stylus syntax.
-
-2011-06-01
-- Fixed filename_complete.
-- Improved :NeoComplCacheToggle, :NeoComplCacheLock, :NeoComplCacheUnlock commands.
-
-2011-05-31
-- Added :NeoComplCacheCachingDictionary in Japanese documentation.
-- Fixed filename_complete.
-
-2011-05-29
-- Optimized filename_complete.
-
-2011-05-26
-- Don't caching when open buffer in preview window.
-- Changed caching conditions.
-
-2011-05-21
-- Genetate relative path in include_complete.
-
-2011-05-19
-- Improved features dictionary.
-
-2011-05-18
-- Fixed filename_complete.
-
-2011-05-17
-- Added neocomplcache#sources#filename_complete#get_complete_words().
-
-2011-05-11
-- Fixed asyn caching error.
-
-2011-05-08
-- Don't split when execute :NeoComplCacheEditRuntimeSnippets and :NeoComplCacheEditSnippets commands.
-- Improved quick match behavior.
-
-2011-05-06
-- Changed :NeoComplCacheEditRuntimeSnippets and :NeoComplCacheEditSnippets split behavior.
-- Fixed rails snippet.
-- Added .gitignore file.
-- Fixed snippet like multi snippet behavior.
-- Improved quick match behavior.
-- Improved multi snippet description.
-
-2011-05-01
-- Fixed neocomplcache snippet sample.
-- Ver.6.1 development is started.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 6.0:
-
-2011-04-26
-- Fixed comment typo.
-
-2011-04-22
-- Improved close popup.
-- Set cpoptions.
-
-2011-04-21
-- Fixed completeopt bug.
-- Deleted g:neocomplcache_disable_caching_buffer_name_pattern option.
-- Added g:neocomplcache_disable_caching_file_path_pattern option.
-
-2011-04-20
-- Fixed asynchronous caching encoding bug.
-
-2011-04-17
-- Fixed preview window problem.
-- Fixed expand snippet error.
-
-2011-04-16
-- Fixed unite completion source.
-
-2011-04-12
-- Improved compare_rank().
-- Improved filename_complete.
-
-2011-04-09
-- Optimized cache load routine.
-
-2011-04-04
-- Improved default completeopt set.
-
-2011-04-02
-- Fixed dictionary_complete bug.
-- Improved cache.
-
-2011-04-01
-- Improved unite source.
-
-2011-03-30
-- Fixed caching bug.
-
-2011-03-29
-- Added <Plug>(neocomplcache_snippets_force_jump) keymapping.
-- Changed <Plug>(neocomplcache_snippets_jump) keymapping.
-- Changed neocomplcache#sources#snippets_complete#expandable().
-
-2011-03-28
-- Added neocomplcache snippet source.
-- Deleted :NeoComplCachePrintSnippets command.
-
-2011-03-25
-- Added neocomplcache asyncronous description.
-
-2011-03-23
-- Fixed buffer_complete error.
-- Improved caching event.
-- Improved neocomplcache#cache#async_load_from_file().
-- Refactoringed caching routine.
-- Ignore caching command line window.
-
-2011-03-22
-- Supported cobol.
-- Fixed async_cache.
-- Improved async_cache debug support.
-- Implemented asyncronous caching in buffer_complete.
-
-2011-03-21
-- Implemented async_cache.vim(testing).
-
-2011-03-17
-- Improved g:neocomplcache_omni_patterns examples.
-- Added README.
-
-2011-03-08
-- Improved hash function.
-
-2011-03-01
-- Call neocomplcache completion when eskk is ascii mode.
-
-2011-02-26
-- Improved vimshell include filetype setting.
-
-2011-02-25
-- Fixed snippet jump bug.
-
-2011-02-23
-- Fixed filename_complete bugs.
-- Fixed buffer_complete error when keyword complete is disabled.
-
-2011-02-22
-- Fixed quick match bugs.
-
-2011-02-16
-- Supported g:eskk#start_completion_length.
-- Added file_include source.
-
-2011-02-15
-- Fixed tags.
-
-2011-02-13
-- Implemented include path complete in filename_complete.
-- Improved detect completefunc.
-- Improved error messages.
-
-2011-02-09
-- Improved examples.
-
-2011-02-07
-- Improved g:neocomplcache_ctags_arguments_list option.
-- Fixed completefunc issue.
-
-2011-02-05
-- Fixed include_complete error.
-
-2011-02-04
-- Improved buffer_name.
-- Improved check dup.
-- Improved unite source.
-
-2011-02-03
-- Added <Plug>(neocomplcache_start_unite_complete) mapping.
-- Improved unite-neocomplcache source.
-
-2011-02-01
-- Improved include_complete behavior for echodoc.
-
-2011-01-28
-- Fixed manual completion error.
-- Deleted register snippets.
-
-2011-01-24
-- Improved context filetype.
-
-2011-01-23
-- Fixed snippets expand pattern.
-- Improved neocomplcache#get_keyword_pattern().
-
-2011-01-22
-- Added neco-ruby description.
-
-2011-01-21
-- Fixed javascript snippet.
-
-2011-01-19
-- Check unite.vim version.
-
-2011-01-18
-- Added neocomplcache#get_next_keyword().
-- Improved feedkeys().
-- Added unite source(experimental).
-- Improved expand snippet.
-
-2011-01-17
-- Improved vim_complete check.
-- Improved completion length.
-- Improved get_cur_text().
-- Added neocomplcache#is_buffer_complete_enabled().
-
-2011-01-16
-- Fixed snippet documentation.
-- Refctoringed snippets_complete.
-- Improved neocomplcache#is_eskk_enabled().
-
-2011-01-15
-- Improved detect paste.
-- Added English snippet manual.
-- Improved Japanese snippet manual.
-
-2011-01-11
-- Fixed snippets_complete error.
-- Improved compare ranks.
-- Refactored.
-
-2011-01-10
-- Improved snippets_complete.
-- Added <Plug>(neocomplcache_snippets_force_expand) keymapping.
-- Changed <Plug>(neocomplcache_snippets_expand) behavior.
-
-2011-01-09
-- Supported unite.vim.
-
-2011-01-08
-- Improved filetype completion.
-
-2011-01-02
-- Fixed indent file.
-- Added ftplugin.
-
-2010-12-28
-- Improved tex keyword pattern.
-
-2010-12-23
-- Fixed expand snippet.
-
-2010-12-22
-- Improved omni_complete.
-
-2010-12-17
-- Open fold when expand snippet.
-
-2010-12-16
-- Added tex same filetype.
-
-2010-12-14
-- Implemented alternative buffer completion in cmdwin.
-- Improved tags_complete.
-
-2010-12-12
-- Ver.6.0 development started.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 5.3:
-2010-12-10
-- Released Ver.5.3.
-
-2010-12-05
-- Supported Konoha language.
-
-2010-11-16
-- Implemented ignore source.
-
-2010-11-14
-- Improved vim keyword pattern.
-
-2010-11-10
-- Fixed :Neco.
-- Independent +reltime.
-
-2010-11-07
-- Improved modeline.
-
-2010-11-04
-- Improved snippets expand.
-- Improved snippets search.
-
-2010-11-02
-- Improved clojure and lisp support.
-
-2010-11-01
-- Improved Perl6 support.
-
-2010-10-25
-- Fixed g:neocomplcache_plugin_rank error.
-
-2010-10-24
-- Fixed :NeoComplCacheEnableCaching error.
-- Fixed examples.
-
-2010-10-23
-- Implemented colorscheme completion.
-- Improved snippets include syntax.
-
-2010-10-21
-- Improved snippet_complete manual.
-
-2010-10-19
-- Fixed vim_complete error.
-- Improved error check.
-
-2010-10-15
-- Improved vim keyword pattern.
-- Improved sid functions support.
-
-2010-10-14
-- Fixed buffer caching bug.
-- Added zimbu support.
-
-2010-10-07
-- Improved python snippets.
-
-2010-10-06
-- Improved g:neocomplcache_omni_patterns description.
-
-2010-10-05
-- Improved haskell keyword pattern.
-
-2010-10-02
-- Ver.5.3 development started.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 5.2:
-2010-09-30
-- Deleted member filter.
-- Fixed delimiter.
-- Supported php namespace.
-- Improved c++ completion.
-- Improved php delimiter.
-- Added :Neco animation.
-
-2010-09-29
-- Improved filename_complete.
-- Added g:neocomplcache_enable_auto_delimiter option.
-
-2010-09-28
-- Fixed filename_complete.
-
-2010-09-27
-- Improved filename complete.
-- Fixed java snippet warning.
-
-2010-09-26
-- Fixed xhtml snippet error.
-- Improved delimiter.
-
-2010-09-24
-- Added ghc_complete description.
-
-2010-09-23
-- Fixed vim_complete kind bug.
-- Improved d snippet.
-- Detect duplicated snippet name.
-
-2010-09-21
-- Added NeoComplCacheCachingInclude description.
-- Improved include cache.
-
-2010-09-18
-- Fixed filename completion error.
-
-2010-09-16
-- Fixed caching bug.
-- Added g:neocomplcache_force_caching_buffer_name_pattern option.
-
-2010-09-15
-- Implemented escaped ` in snippets_complete.
-- Improved snippet syntax.
-
-2010-09-10
-- Improved caching algorithm.
-- Added g:neocomplcache_disable_auto_select_buffer_name_pattern option.
-
-2010-09-08
-- Improved cache timing.
-- Revised documentation.
-- Fixed for Vim 7.0.
-- Added install description.
-
-2010-09-06
-- Improved for echodoc.
-
-2010-09-04
-- Improved omni_complete default pattern.
-
-2010-09-03
-- Fixed snippets analyze.
-- Fixed plugin manual.
-
-2010-09-02
-- Deleted g:neocomplcache_enable_display_parameter option.
-- Added g:neocomplcache_enable_caching_message option.
-- Supported Vim7.3 in vim_complete.
-
-2010-09-01
-- Fixed :Neco.
-- Improved caching message.
-- Fixed filtering.
-
-2010-08-31
-- Improved :Neco.
-- Improved echo.
-
-2010-08-30
-- Improved ctags arguments for mac.
-- Fixed mac check.
-
-2010-08-29
-- Fixed caching timing.
-- Added objj support.
-
-2010-08-25
-- Improved keyword patterns.
-- Improved filename pattern.
-- Fixed multibyte check.
-
-2010-08-24
-- Improved g:neocomplcache_ctags_arguments_list.
-- Fixed include_complete bugs.
-
-2010-08-23
-- Improved print caching.
-
-2010-08-22
-- Improved get_cur_text().
-- Implemented neocomplcache#do_auto_complete().
-- Improved print caching.
-
-2010-08-20
-- Fixed is_enabled error.
-- Implemented member completion in buffer_complete.
-- Added shell like behavior settings.
-
-2010-08-19
-- Fixed get_cur_text() bug.
-- Fixed examples.
-- Improved for echodoc.
-- Fixed get_cur_text() in snippets_complete.
-
-2010-08-17
-- Fixed abbrev_complete redir bug.
-- Fixed var_dictionary complete in vim_complete.
-- Improved get_cur_text().
-- Fixed keyword pattern.
-- Fixed echodoc in include_complete.
-
-2010-08-16
-- Fixed abbrev_complete.
-- Supported lua.
-
-2010-08-15
-- Improved plugin error catch.
-
-2010-08-14
-- Improved error catch.
-
-2010-08-13
-- Improved caching.
-- Fixed nasm error.
-
-2010-08-12
-- Fixed filter bug.
-
-2010-08-11
-- Refactoringed :Neco command.
-
-2010-08-09
-- Fixed include_complete error in echodoc.
-- Fixed context filetype bug in filetype plugin.
-
-2010-08-08
-- Improved lock.
-- Supported echodoc in vim_complete.
-
-2010-08-07
-- Implemented neocomplcache enabled check.
-- Supported echodoc in vim_complete.
-- Supported echodoc in snippets_complete.
-
-2010-08-05
-- Improved ctags arguments.
-- Improved gas syntax.
-
-2010-08-04
-- Improved eskk support.
-- Improved vim_complete check.
-- Fixed vim_complete cur_keyword_str bug.
-
-2010-08-03
-- Fixed filename_complete error.
-
-2010-08-02
-- Ver.5.2 development started.
-- Fixed filename_complete.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 5.1:
-2010-08-02
-- Released neocomplcache Ver.5.1
-- Fixed css snippet.
-
-2010-07-31
-- Supported coffee script.
-- Improved neocomplcache#filetype_complete().
-- Skip filename completion when too many candidates.
-- Added :NeoComplCacheCachingDictionary discription.
-
-2010-07-30
-- Fixed documentation.
-
-2010-07-29
-- Added omni completion examples.
-- Supported inline assembly language.
-- Fixed vim_complete commands.dict.
-- Added neocomplcache#set_completion_length().
-
-2010-07-28
-- Fixed eskk check.
-- Improved vim keyword pattern.
-- Improved examples.
-- Fixed vim_complete error.
-
-2010-07-27
-- Fixed autocompletion freeze.
-- Fixed omni completion bug.
-- Fixed :NeoComplCacheToggle.
-- Improved g:neocomplcache_plugin_disable behavior.
-- Improved eskk check.
-
-2010-07-26
-- Fixed snippets expand error.
-- Fixed error when local variable completion.
-- Improved haskell keyword pattern.
-
-2010-07-25
-- Improved termtter keywords.
-- Improved filetype completion.
-- Implemented set rank helper.
-- Changed vim_complete marker.
-- Implemented syntax attr helper.
-- Improved startup.
-- Improved member filter.
-- Implemented filetype plugin.
-- Fixed neocomplcache#system().
-- Improved local variable analysis.
-- Implemented expand completion.
-- Refactoringed vim_complete.
-- Improved vim_complete.
-- Changed neocomplcache#set_dictionary_helper().
-- Fixed example.
-- Allow blank line in snippet.
-- Fixed snippet parse.
-- Fixed ftplugin bug.
-- Improved context filetype.
-
-2010-07-23
-- Fixed environments parse bug.
-- Improved include check.
-
-2010-07-22
-- Improved detect completefunc.
-- Improved interactive termtter pattern.
-- Improved caching.
-- Fixed analyzing function.
-
-2010-07-21
-- Improved autoload plugins.
-- Improved g:neocomplcache_omni_patterns description.
-
-2010-07-19
-- Improved truncate filename.
-- Fixed quick match bug.
-- Improved include_complete.
-- Supported union.
-
-2010-07-18
-- Improved multibyte trunk.
-- Improved neocomplcache#snippets_complete#expandable().
-- Disabled Ruby omni completion.
-
-2010-07-17
-- Fixed neocomplcache#match_word() bug.
-- Optimized match.
-- Improved print error.
-
-2010-07-16
-- Improved neocomplcache#get_auto_completion_length().
-- Fixed documentation.
-- Improved quickmatch selection.
-- Improved check wildcard.
-- Fixed quickmatch selection.
-- Improved vimshell pattern.
-- Improved :NeoComplCacheAutoCompletionLength behavior.
-- Improved buffer caching.
-
-2010-07-15
-- Fixed error when complete directory.
-- Added g:neocomplcache_quick_match_table.
-- Added neocomplcache#smart_close_popup().
-- Improved tilde substitution.
-- Improved neocomplcache#close_popup().
-
-2010-07-13
-- Supported gdb keyword.
-
-2010-07-12
-- Improved eskk and vimproc check.
-
-2010-07-11
-- Supported GetLatestVimScripts.
-
-2010-07-10
-- Deleted spell_complete.
-- Implemented dictionary plugins.
-- Deleted obsolute functions.
-
-2010-07-09
-- Improved eskk check.
-- Improved javascript support.
-- Improved css keyword pattern.
-- Fixed quickmatch error.
-- Fixed neocomplcache#complete_common_string() bug.
-
-2010-07-08
-- Fixed get filetype timing in snippets_complete.
-
-2010-07-07
-- Fixed eskk omni completion bug.
-
-2010-07-06
-- Fixed for eskk.
-
-2010-07-04
-- Disabled keyword_complete when eskk is enabled.
-
-2010-07-01
-- Fixed context filetype bug.
-- Added tex in text mode filetypes.
-- Improved text mode.
-
-2010-06-28
-- Ver.5.1 development started.
-- Improved integrated completion.
-- Improved snippet alias pattern.
-- Implemented text mode.
-- Added g:neocomplcache_text_mode_filetypes option.
-- Added "nothing" in text mode filetype.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 5.0:
+ChangeLog NeoComplCache 5.0: {{{
 2010-06-24
 - Improved eruby support.
 - Improved ruby keyword.
@@ -2336,7 +758,7 @@ ChangeLog neocomplcache 5.0:
 - Improved erlang keyword pattern.
 - Improved d and java keyword patterns.
 - Added g:neocomplcache_delimiter_patterns option.
-- Implemented delimiter completion.
+- Implemented delemiter completion.
 - Improved abbr.
 
 2010-06-15
@@ -2437,8 +859,8 @@ ChangeLog neocomplcache 5.0:
 - Changed NeoComplCacheCachingEnable into NeoComplCacheEnableCaching.
 - Check obsolute options.
 
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 4.30:
+}}}
+ChangeLog NeoComplCache 4.30: {{{
 2010-05-31
 - Marked as ver.4.30.
 
@@ -2459,7 +881,7 @@ ChangeLog neocomplcache 4.30:
 2010-05-27
 - Caching readonly buffer.
 - Fixed menu bug in buffer_complete.
-- Improved recaching behavior.
+- Improved recaching behaivior.
 - Improved caching.
 
 2010-05-26
@@ -2543,7 +965,7 @@ ChangeLog neocomplcache 4.30:
 
 2010-04-25
 * Enable spell_complete in manual_complete.
-* Fixed quickmatch behavior.
+* Fixed quickmatch behaivior.
 * Improved user commands analsze in vim_complete.
 
 2010-04-20
@@ -2552,7 +974,7 @@ ChangeLog neocomplcache 4.30:
 * Enable cache in "[Command line]" buffer.
 
 2010-04-17
-* Improved print prototype behavior when g:neocomplcache_cursor_hold_i_time.
+* Improved print prototype behaivior when g:neocomplcache_cursor_hold_i_time.
 * Improved redraw.
 * Improved for skk.vim.
 
@@ -2568,9 +990,8 @@ ChangeLog neocomplcache 4.30:
 * Implemented CursorHoldI completion.
 * Added g:neocomplcache_enable_cursor_hold_i and g:neocomplcache_cursor_hold_i_time options.
 * Deleted g:NeoComplCache_EnableSkipCompletion and g:NeoComplCache_SkipCompletionTime options.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 4.20:
+}}}
+ChangeLog NeoComplCache 4.20: {{{
 2010-04-15
     * Changed default value of g:neocomplcache_enable_ignore_case.
 
@@ -2632,9 +1053,8 @@ ChangeLog neocomplcache 4.20:
 
 2010-02-18
     * Fixed filename pattern.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 4.00-:
+}}}
+ChangeLog NeoComplCache 4.00-: {{{
    4.10:
     - Fixed interactive Gauche support.
     - Added omni_complete and vim_complete rank.
@@ -2644,7 +1064,7 @@ ChangeLog neocomplcache 4.00-:
     - Improved skk.vim support.
     - Improved lisp keyword pattern.
     - Added clojure support.
-
+    
    4.09:
     - Improved syntax detect in snippets_complete.
     - Improved NeoComplCachePrintSnippets command.
@@ -2664,7 +1084,7 @@ ChangeLog neocomplcache 4.00-:
     - Fixed wildcard bug.
     - Fixed indent.
     - Supported interactive ocaml.
-
+    
    4.08:
     - Improved keywords in vim_complete.
     - Deleted g:NeoComplCache_NonBufferFileTypeDetect option.
@@ -2672,10 +1092,10 @@ ChangeLog neocomplcache 4.00-:
     - Fixed neocomplcache#system.
     - Added g:neocomplcache_ctags_program option.
     - Fixed ctags execution bug.
-    - Improved quickmatch behavior.
+    - Improved quickmatch behaivior.
     - Fixed complete length bug in omni_complete.
     - Fixed wildcard freeze in filename_complete.
-
+    
    4.07:
     - Improved filaname pattern.
     - Deleted '...' pattern.
@@ -2698,7 +1118,7 @@ ChangeLog neocomplcache 4.00-:
     - Added completefunc_complete.
     - Fixed neocomplcache#get_cur_text() bug.
     - Fixed unpack dictionary bug in tags_complete.
-
+    
    4.05:
     - Improved snippet alias.
     - Improved analyzing extra args in vim_complete.
@@ -2708,7 +1128,7 @@ ChangeLog neocomplcache 4.00-:
     - Don't fnamemodify in omni_complete.
     - Improved trunk filename in filename_complete.
     - Fixed complete common string bug.
-
+    
    4.04:
     - Implemented common string completion.
     - Added css snippet file.
@@ -2723,14 +1143,14 @@ ChangeLog neocomplcache 4.00-:
     - Implemented fast mode when last completion was skipped.
     - Deleted C/C++ omni completion support.
     - Improved caching tag.
-
+    
    4.03:
     - Don't use abs() for Vim7.
     - Changed display interface in snippets_complete.
     - Implemented no options in vim_complete.
     - Improved compatiblity with snipMate.
     - Fixed typo in neocomplcache.jax.
-
+    
    4.02:
     - Added Python snippet.
     - Added g:neocomplcache_tags_filter_patterns option.
@@ -2740,7 +1160,7 @@ ChangeLog neocomplcache 4.00-:
     - Fixed member fileter error.
     - Fixed fatal include_complete error.
     - Fixed haskell and ocaml patterns.
-
+    
    4.01:
     - Added filename pattern.
     - Fixed in TeX behavior in filename_complete.
@@ -2756,7 +1176,7 @@ ChangeLog neocomplcache 4.00-:
     - Improved randomize.
     - Changed g:neocomplcache_CalcRankRandomize option as g:neocomplcache_enable_randomize.
     - Fixed save cache error.
-
+    
    4.00:
     - Fixed manual completion error.
     - Deleted g:NeoComplCache_PreviousKeywordCompletion. It's default.
@@ -2783,9 +1203,9 @@ ChangeLog neocomplcache 4.00-:
     - Deleted caching current buffer in include_complete.
     - Improved tex keyword pattern.
     - Improved analyse in syntax_complete.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 3.00-:
+    
+     }}}
+ChangeLog NeoComplCache 3.00-: {{{
    3.22:
     - Fixed manual completion error.
     - Fixed set completeopt bug.
@@ -2798,7 +1218,7 @@ ChangeLog neocomplcache 3.00-:
     - Fixed snippet expand bug in snippets_complete.
     - Implemented keyword cache in omni_complete.
     - Implemented skip directory in filename_complete.
-
+    
    3.21:
     - Catch error in omni_complete.
     - Deleted Filename() and g:snips_author in snippets_complete.
@@ -2897,7 +1317,7 @@ ChangeLog neocomplcache 3.00-:
     - Auto complete when CursorMovedI not CursorHoldI.
     - Reimplemented g:NeoComplCache_SkipInputTime option.
     - Fixed dup check bug in syntax_complete.
-
+    
    3.11:
     - Filtering same word.
     - Implemented member filter.
@@ -2922,7 +1342,7 @@ ChangeLog neocomplcache 3.00-:
     - Save error log when analyzing tags.
 
    3.09:
-    - Improved wildcard behavior.
+    - Improved wildcard behaivior.
     - Disabled partial match.
     - Added g:neocomplcache_plugin_disable option.
     - Fixed wildcard bug.
@@ -2931,7 +1351,7 @@ ChangeLog neocomplcache 3.00-:
     - Improved manual completion.
     - Fixed filtering bug.
     - Print filename when caching.
-
+    
    3.08:
     - Implemented NeoComplCacheCachingTags command.
     - Disable auto caching in tags_complete.
@@ -2973,7 +1393,7 @@ ChangeLog neocomplcache 3.00-:
     - Changed g:neocomplcache_max_list and g:neocomplcache_QuickMatchmax_list default value.
     - Fixed skip error.
     - Implemented completion skip if previous completion is empty.
-
+    
    3.04:
     - Expand tilde.
     - Use complete_check().
@@ -3014,7 +1434,7 @@ ChangeLog neocomplcache 3.00-:
     - Added xhtml snippet(Thanks just!).
     - Fixed css error.
     - Implemented optional placeholder.
-
+   
    3.00:
     - Implemented multiple keyword.
     - Improved html keyword completion.
@@ -3025,9 +1445,8 @@ ChangeLog neocomplcache 3.00-:
     - Splitted filename completion and omni completion and keyword completion.
     - Improved remove next keyword.
     - Renamed keyword_complete.vim as buffer_complete.vim.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 2.51-:
+     }}}
+ChangeLog NeoComplCache 2.51-: {{{
    2.78:
     - Supported abbr in omni completion.
     - Clear quickmatch cache when auto complete is skipped.
@@ -3039,7 +1458,7 @@ ChangeLog neocomplcache 2.51-:
     - Implemented completion undo.
     - Fixed non-initialize error.
     - Fixed wildcard bug.
-    - Improved quickmatch behavior.
+    - Improved quickmatch behaivior.
     - Added g:neocomplcache_caching_percent_in_statusline option.
     - Fixed completion column bug.
 
@@ -3080,7 +1499,7 @@ ChangeLog neocomplcache 2.51-:
     - Fixed dup bug in snippets_complete.
 
    2.72:
-    - Improved quickmatch behavior.
+    - Improved quickmatch behaivior.
     - Fixed expand() bug in snippets_complete.
     - Fixed prefix bug in filename completion.
     - Improved filename completion.
@@ -3097,7 +1516,7 @@ ChangeLog neocomplcache 2.51-:
     - Improved get cursour word.
     - Added Objective-C/C++ support.
     - Fixed filename completion bug when environment variable used.
-    - Improved skipped behavior.
+    - Improved skipped behaivior.
     - Implemented short filename completion.
     - Check cdpath in filename completion.
     - Fixed expand jump bug in snippets completion.
@@ -3222,18 +1641,17 @@ ChangeLog neocomplcache 2.51-:
     - Optimized calc rank.
     - Fixed abbr_save error.
     - Don't caching on BufEnter.
-    - Optimized manual_complete behavior.
+    - Optimized manual_complete behaivior.
     - Added g:neocomplcache_manual_completion_start_length option.
     - Fixed next keyword completion bug.
     - Fixed caching initialize bug.
     - Fixed on InsertLeave error.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 2.00-2.50:
+     }}}
+ChangeLog NeoComplCache 2.00-2.50: {{{
    2.50: Caching on editing file.
     - Optimized NeoComplCacheCachingBuffer.
     - Implemented neocomplcache#close_popup() and neocomplcache#cancel_popup().
-    - Fixed ignore case behavior.
+    - Fixed ignore case behaivior.
     - Fixed escape error.
     - Improved caching.
     - Deleted g:NeoComplCache_TryKeywordCompletion and g:NeoComplCache_TryDefaultCompletion options.
@@ -3316,7 +1734,7 @@ ChangeLog neocomplcache 2.00-2.50:
    2.33:
     - Implemented <Plug>(neocomplcache_snippets_expand) keymapping.
     - Implemented place holder.
-    - Improved place holder's default value behavior.
+    - Improved place holder's default value behaivior.
     - Enable filename completion in lisp filetype.
 
    2.32:
@@ -3484,9 +1902,8 @@ ChangeLog neocomplcache 2.00-2.50:
      - Fixed skipped bug.
      - Improved commands.
      - Deleted g:NeoComplCache_DrawWordsRank option.
-
-------------------------------------------------------------------------------
-ChangeLog neocomplcache 1.00-1.60:
+     }}}
+ChangeLog NeoComplCache 1.00-1.60: {{{
    1.60:
      - Improved calc similar algorithm.
    1.59:
@@ -3653,9 +2070,8 @@ ChangeLog neocomplcache 1.00-1.60:
    1.00:
      - Renamed.
      - Initial version.
-
-------------------------------------------------------------------------------
-ChangeLog AltAutoComplPop:
+     }}}
+ChangeLog AltAutoComplPop: {{{
    2.62:
      - Set lazyredraw at auto complete.
      - Added g:AltAutoComplPop_CalcRankMaxLists option.
@@ -3683,7 +2099,7 @@ ChangeLog AltAutoComplPop:
      - Added g:AltAutoComplPop_CalcRankCount option.
    2.11:
      - Added g:AltAutoComplPop_SlowCompleteSkip option.
-     - Removed g:AltAutoComplPop_OptimizeLevel option.
+     - Removed g:AltAutoComplPop_OptimiseLevel option.
    2.10:
      - Added g:AltAutoComplPop_QuickMatch option.
      - Changed g:AltAutoComplPop_MaxList default value.
@@ -3692,8 +2108,8 @@ ChangeLog AltAutoComplPop:
      - Added g:AltAutoComplPop_EnableAsterisk option.
      - Fixed next cache line cleared bug.
    2.08:
-     - Added g:AltAutoComplPop_OptimizeLevel option.
-       If list has many keyword, will optimize complete. 
+     - Added g:AltAutoComplPop_OptimiseLevel option.
+       If list has many keyword, will optimise complete. 
      - Added g:AltAutoComplPop_DisableAutoComplete option.
    2.07:
      - Fixed caching miss when BufRead.
@@ -3723,6 +2139,7 @@ ChangeLog AltAutoComplPop:
      - Implemented file completion.
    1.0:
      - Initial version.
+}}}
 
 ==============================================================================
-vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:noet:
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:fdm=marker:noet:
